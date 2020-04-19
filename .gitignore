@@ -1,2 +1,29 @@
 *.class
 *.log
+
+.cache
+.history
+.lib/
+dist/*
+target/
+project/target/
+project/project/target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+.ensime
+.ensime_cache/
+.scala_dependencies
+.worksheet
+
+## node.js specific
+node_modules/
+package-lock.json
+
+## IntelliJ Idea specific
+.idea/
+
+## macOS specific
+.DS_Store
