@@ -7,7 +7,7 @@ object Dependencies {
     val circe         = "0.13.0"
     val scalaCompiler = "2.13.1"
     val simulacrum    = "1.0.0"
-    val uTest         = "0.7.2"
+    val uTest         = "0.7.4"
   }
 
   val caseApp       = "com.github.alexarchambault" %% "case-app"      % Versions.caseApp
