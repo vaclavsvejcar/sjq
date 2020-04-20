@@ -8,16 +8,16 @@ lazy val root = (project in file("."))
   .settings(
     name := "sjq",
     libraryDependencies ++= Seq(
-      Dependencies.caseApp,
       Dependencies.circeCore,
       Dependencies.circeGeneric,
       Dependencies.circeParser,
       Dependencies.scalaCompiler,
+      Dependencies.scopt,
       Dependencies.simulacrum,
       Dependencies.uTest
     ),
     testFrameworks += new TestFramework("utest.runner.Framework"),
-    assembly / mainClass := Some("dev.svejcar.sjq.CliApp"),
+    assembly / mainClass := Some("dev.svejcar.sjq.Launcher"),
     assembly / test := {},
     Test / parallelExecution := false
   )
