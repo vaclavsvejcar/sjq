@@ -5,7 +5,7 @@ import utest._
 import scala.io.Source
 
 object IntegrationSuite extends TestSuite {
-  import Executor._
+  import dev.svejcar.sjq.cli.Executor._
   import Parser._
   import Renderer.ops._
 

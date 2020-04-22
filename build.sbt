@@ -8,6 +8,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "sjq",
     libraryDependencies ++= Seq(
+      Dependencies.ammoniteRepl,
       Dependencies.circeCore,
       Dependencies.circeGeneric,
       Dependencies.circeParser,
@@ -19,6 +20,10 @@ lazy val root = (project in file("."))
     testFrameworks += new TestFramework("utest.runner.Framework"),
     assembly / mainClass := Some("dev.svejcar.sjq.Launcher"),
     assembly / test := {},
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+      case x                             => MergeStrategy.first
+    },
     Test / parallelExecution := false
   )
 

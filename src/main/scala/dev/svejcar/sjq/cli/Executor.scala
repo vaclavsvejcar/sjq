@@ -1,4 +1,4 @@
-package dev.svejcar.sjq.core
+package dev.svejcar.sjq.cli
 
 import io.circe.Json
 
