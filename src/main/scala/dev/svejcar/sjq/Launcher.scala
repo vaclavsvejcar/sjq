@@ -12,12 +12,6 @@ object RunMode {
   case object Other extends RunMode
 }
 
-sealed trait InputSource
-object InputSource {
-  case class LocalFile(path: String)  extends InputSource
-  case class UrlLocation(url: String) extends InputSource
-}
-
 case class Options(mode: RunMode = RunMode.Other, access: String = "", json: String = "")
 
 object Launcher {
@@ -28,19 +22,19 @@ object Launcher {
   private val parser = {
     import builder._
     OParser.sequence(
-      programName("sjq"),
-      head("sjq", " v0.1.0"),
+      programName(BuildInfo.name),
+      head(BuildInfo.name, BuildInfo.version),
       help("help").text("prints this usage text"),
       cmd("cli")
         .action((_, c) => c.copy(mode = RunMode.Cli))
-        .text("runs non-interactive mode, similar to original jq")
+        .text("run non-interactive mode, similar to original jq")
         .children(
           opt[String]('a', "access").required().action((x, c) => c.copy(access = x)),
           opt[String]('j', "json").action((x, c) => c.copy(json = x))
         ),
       cmd("repl")
         .action((_, c) => c.copy(mode = RunMode.Repl))
-        .text("runs interactive mode using the Ammonite REPL")
+        .text("run interactive mode using the Ammonite REPL")
         .children(
           opt[String]('j', "json").required().action((x, c) => c.copy(json = x))
         )

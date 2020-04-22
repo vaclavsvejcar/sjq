@@ -5,6 +5,7 @@ ThisBuild / licenses += ("BSD-3-Clause", url("https://opensource.org/licenses/BS
 ThisBuild / homepage := Some(url("https://github.com/vaclavsvejcar/sjq"))
 
 lazy val root = (project in file("."))
+  .enablePlugins(BuildInfoPlugin)
   .settings(
     name := "sjq",
     libraryDependencies ++= Seq(
@@ -24,7 +25,9 @@ lazy val root = (project in file("."))
       case PathList("META-INF", xs @ _*) => MergeStrategy.discard
       case x                             => MergeStrategy.first
     },
-    Test / parallelExecution := false
+    Test / parallelExecution := false,
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "dev.svejcar.sjq"
   )
 
 ThisBuild / scalacOptions ++= Seq(
