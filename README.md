@@ -7,43 +7,7 @@ __sjq__ is small tool written in [Scala][web:scala] that compiles your input _JS
 > 🚧 __Work in Progress__ 🚧 - This software is under active development and hasn't even reached its initial public release. Please bear in mind that documentation is likely missing and API and/or command line interface can change unexpectedly. At least for now, below is small demo how you can use __sjq__ right now.
 
 ## Example of Use
-
-```sh
-$ cat ./example.json
-{
-    "fruit": "Apple",
-    "size": "Large",
-    "color": "Red"
-}
-
-$ java -jar ./sjq.jar repl -j "$(cat ./example.json)"
-
---- Welcome to sjq REPL mode ---
-Compiling type definitions from input JSON (this may take a while)...
-
-
-[i] To access the data parsed from JSON use the '_root' variable.
-[i] To serialize data back to JSON use '.asJson.spaces2'
-
-
-Welcome to the Ammonite Repl 2.0.4 (Scala 2.13.1 Java 1.8.0_222)
-@ _root 
-res0: root = root("Apple", "Large", "Red")
-
-@ _root.size 
-res1: String = "Large"
-
-@ _root.copy(size = "Small").asJson.spaces2 
-res3: String =
-"""{
-  "fruit" : "Apple",
-  "size" : "Small",
-  "color" : "Red"
-}"""
-
-
-```
-
+<a href="https://asciinema.org/a/X8V6QCX6VDfZHU7CsCWIO9uet" target="_blank"><img src="https://asciinema.org/a/X8V6QCX6VDfZHU7CsCWIO9uet.svg" /></a>
 
 [web:ammonite-repl]: https://ammonite.io/#Ammonite-REPL
 [web:jq]: https://stedolan.github.io/jq/
