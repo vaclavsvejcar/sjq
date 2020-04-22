@@ -1,5 +1,7 @@
 package dev.svejcar.sjq.core
 
+import cats.implicits._
+import dev.svejcar.sjq.core.instances.all._
 import utest._
 
 object CaseClassSuite extends TestSuite {
@@ -43,7 +45,7 @@ object CaseClassSuite extends TestSuite {
         )
       )
 
-      val actual = Merge[CaseClass].merge(cc1, cc2)
+      val actual = cc1 |+| cc2
       assert(actual == expected)
     }
   }
