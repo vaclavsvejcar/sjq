@@ -3,9 +3,9 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val ammonite      = "2.0.4"
+    val ammonite      = "2.1.1"
     val circe         = "0.13.0"
-    val scalaCompiler = "2.13.1"
+    val scalaCompiler = "2.13.2"
     val scopt         = "4.0.0-RC2"
     val simulacrum    = "1.0.0"
     val uTest         = "0.7.4"
