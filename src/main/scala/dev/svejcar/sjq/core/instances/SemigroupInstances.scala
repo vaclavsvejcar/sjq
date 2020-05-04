@@ -9,37 +9,32 @@ trait SemigroupInstances {
   implicit def typeSemigroup[T <: Type]: Semigroup[T] = (x: T, y: T) => Seq(x, y).minBy(_.priority)
 
   implicit val fieldSemigroup: Semigroup[Field] = (x: Field, y: Field) => {
-    require(x.name == y.name, "Attempting to merge two different field definitions")
-
-    Seq(x, y).minBy(_.`type`.priority)
+    require(x.name == y.name, "Attempting to combine two different field definitions")
+    x.copy(`type` = x.`type` |+| y.`type`)
   }
 
   implicit val caseClassSemigroup: Semigroup[CaseClass] = (x: CaseClass, y: CaseClass) => {
-    require(x.name == y.name, "Attempting to merge two different case class definitions")
+    require(x.name == y.name, "Attempting to combine two different case classes")
 
-    def merge(cc1: CaseClass, cc2: CaseClass): CaseClass = {
-      val commonFields = cc1.fields intersect cc2.fields
-
-      def combineFields(cc: CaseClass): Set[Field] = (cc.fields diff commonFields).map { field =>
-        val monadType = field.`type`.monad.map(_ |+| MonadType.Option).getOrElse(MonadType.Option)
-        field.copy(`type` = field.`type`.withMonad(monadType))
+    val newFields: Set[Field] = (x.fields.toSeq ++ y.fields.toSeq)
+      .groupBy(_.name)
+      .flatMap {
+        case (_, field :: Nil)            => field.copy(`type` = field.`type`.withMonad(MonadType.Option)).some
+        case (_, field1 :: field2 :: Nil) => (field1 |+| field2).some
+        case _                            => none[Field]
       }
+      .toSet
 
-      val newFields = (commonFields ++ combineFields(cc1) ++ combineFields(cc2))
-        .groupBy(_.name)
-        .view
-        .mapValues(_.reduceLeft((aggr, next) => aggr |+| next))
-        .values
-        .toSet
+    val newChildren: Set[CaseClass] = (x.children.toSeq ++ y.children)
+      .groupBy(_.name)
+      .flatMap {
+        case (_, child :: Nil)            => child.some
+        case (_, child1 :: child2 :: Nil) => (child1 |+| child2).some
+        case _                            => none[CaseClass]
 
-      val allChildren = cc1.children ++ cc2.children
-      val mergedNodes = allChildren.groupBy(_.name).values.filter(_.size > 1).map(_.reduceLeft(merge)).toSet
+      }
+      .toSet
 
-      val newNodes = mergedNodes ++ allChildren.filterNot(nodes => mergedNodes.map(_.name).contains(nodes.name))
-
-      CaseClass(cc1.name, newFields, newNodes)
-    }
-
-    merge(x, y)
+    x.copy(fields = newFields, children = newChildren)
   }
 }
