@@ -14,11 +14,10 @@ lazy val root = (project in file("."))
       Dependencies.circeGeneric,
       Dependencies.circeParser,
       Dependencies.scalaCompiler,
+      Dependencies.scalaTest,
       Dependencies.scopt,
-      Dependencies.simulacrum,
-      Dependencies.uTest
+      Dependencies.simulacrum
     ),
-    testFrameworks += new TestFramework("utest.runner.Framework"),
     assembly / mainClass := Some("dev.svejcar.sjq.Launcher"),
     assembly / test := {},
     assembly / assemblyMergeStrategy := {

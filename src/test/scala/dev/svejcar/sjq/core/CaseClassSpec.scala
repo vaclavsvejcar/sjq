@@ -1,15 +1,14 @@
 package dev.svejcar.sjq.core
 
 import cats.implicits._
+import dev.svejcar.sjq.core.domain._
 import dev.svejcar.sjq.core.instances.all._
-import utest._
+import org.scalatest.funspec.AnyFunSpec
 
-object CaseClassSuite extends TestSuite {
-  import domain._
+class CaseClassSpec extends AnyFunSpec {
 
-  override def tests: Tests = Tests {
-
-    test("Two case class definitions of same name should be merged correctly") {
+  describe("Semigroup instance for CaseClass") {
+    it("should combine two instances") {
       val ci11 =
         CaseClass("field1", Set(Field("field1", PlainType.String()), Field("field2", PlainType.String())), Set.empty)
       val ci12 =
@@ -48,5 +47,7 @@ object CaseClassSuite extends TestSuite {
       val actual = cc1 |+| cc2
       assert(actual == expected)
     }
+
   }
+
 }
