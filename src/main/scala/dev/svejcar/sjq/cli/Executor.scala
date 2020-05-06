@@ -13,7 +13,7 @@ object Executor {
   def executeCode(json: Json, code: String): String =
     toolbox.eval(toolbox.parse(code)).asInstanceOf[Json => String](json)
 
-  def generateCode(operation: String, definitions: String): String =
+  def generateCode(operation: String, definitions: String, rootType: String): String =
     s"""
        |import io.circe.Json
        |
@@ -24,7 +24,7 @@ object Executor {
        |
        |  $definitions
        |
-       |  val _root = json.as[root].getOrElse(null)
+       |  val root = json.as[$rootType].getOrElse(null)
        |  val result = $operation
        |  result.asJson.spaces2
        |}

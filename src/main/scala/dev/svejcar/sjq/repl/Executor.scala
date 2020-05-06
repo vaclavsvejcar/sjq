@@ -4,7 +4,7 @@ object Executor {
 
   def executeCode(code: String): Unit = ammonite.Main(predefCode = code).run()
 
-  def generateCode(rawJson: String, definitions: String): String =
+  def generateCode(rawJson: String, definitions: String, rootType: String): String =
     s"""|import io.circe.Json
         |import io.circe.generic.auto._
         |import io.circe._
@@ -14,11 +14,11 @@ object Executor {
         |println("Compiling type definitions from input JSON (this may take a while)...")
         |$definitions
         |println("\\n")
-        |println("[i] To access the data parsed from JSON use the '_root' variable.")
+        |println("[i] To access the data parsed from JSON use the 'root' variable.")
         |println("[i] To serialize data back to JSON use '.asJson.spaces2'\\n\\n")
         |
-        |val _json = io.circe.parser.parse(\"\"\" $rawJson \"\"\").toOption.get
-        |val _root = _json.as[root].getOrElse(null)
+        |val json = io.circe.parser.parse(\"\"\" $rawJson \"\"\").toOption.get
+        |val root = json.as[$rootType].getOrElse(null)
         |""".stripMargin
 
 }

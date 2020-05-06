@@ -56,14 +56,15 @@ object Launcher {
 
   private def runCli(access: String, json: Option[String]): Unit = {
     import dev.svejcar.sjq.cli.Executor._
+    import dev.svejcar.sjq.core.Emitter._
     import dev.svejcar.sjq.core.Parser._
-    import dev.svejcar.sjq.core.Renderer.ops._
 
     val result = for {
       rawJson <- getJson(json)
       json    <- io.circe.parser.parse(rawJson).left.map(_.message)
-      definitions     = parseDefinitions(json).renderCode
-      executionResult = executeCode(json, generateCode(access, definitions))
+      node            = parseJson(json)
+      code            = emitScala(node)
+      executionResult = executeCode(json, generateCode(access, code.getOrElse(""), emitType(node, RootType, None)))
     } yield executionResult
 
     println(result.fold(identity, identity))
@@ -71,15 +72,16 @@ object Launcher {
   }
 
   private def runRepl(json: Option[String]): Unit = {
+    import dev.svejcar.sjq.core.Emitter._
     import dev.svejcar.sjq.core.Parser._
-    import dev.svejcar.sjq.core.Renderer.ops._
     import dev.svejcar.sjq.repl.Executor._
 
     val result = for {
       rawJson <- Try(json.get).toEither
       json    <- io.circe.parser.parse(rawJson).left.map(_.message)
-      definitions = parseDefinitions(json).renderCode
-    } yield executeCode(generateCode(rawJson, definitions))
+      node = parseJson(json)
+      code = emitScala(node)
+    } yield executeCode(generateCode(rawJson, code.getOrElse(""), emitType(node, RootType, None)))
 
     result.left.map(println)
     System.exit(if (result.isLeft) 1 else 0)

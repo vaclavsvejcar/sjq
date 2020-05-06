@@ -1,16 +1,16 @@
 package dev.svejcar.sjq.core
 
-import dev.svejcar.sjq.core.Parser.parseDefinitions
+import dev.svejcar.sjq.core.Parser.parseJson
 import org.scalatest.funspec.AnyFunSpec
 
-class ParserSpec extends AnyFunSpec {
+class ParserSpec extends AnyFunSpec with TestData {
 
-  describe("Parser") {
-    it("should successfully generate definitions from raw JSON") {
-      val json   = io.circe.parser.parse(RawJson).toOption.get
-      val parsed = parseDefinitions(json)
+  describe("JSON parser") {
+    it("should parse JSON into internal AST representation") {
+      val json   = io.circe.parser.parse(RawJson1).toOption.get
+      val actual = parseJson(json)
 
-      assert(parsed == ParsedDefinitions)
+      assert(actual == ParsedNode1)
     }
   }
 
