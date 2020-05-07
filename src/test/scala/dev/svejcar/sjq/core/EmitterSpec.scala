@@ -9,7 +9,7 @@ class EmitterSpec extends AnyFunSpec with TestData {
 
     describe("emitScala") {
       it("should emit valid code for case class") {
-        assert(emitScala(ParsedNode1) == EmittedNode1.some)
+        assert(emit(ParsedNode1) == EmittedNode1.some)
       }
     }
 

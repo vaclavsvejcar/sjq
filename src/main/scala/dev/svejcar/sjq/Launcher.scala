@@ -62,9 +62,9 @@ object Launcher {
     val result = for {
       rawJson <- getJson(json)
       json    <- io.circe.parser.parse(rawJson).left.map(_.message)
-      node            = parseJson(json)
-      code            = emitScala(node)
-      executionResult = executeCode(json, generateCode(access, code.getOrElse(""), emitType(node, RootType, None)))
+      ast             = parseJson(json)
+      code            = emit(ast)
+      executionResult = executeCode(json, generateCode(access, code.getOrElse(""), emitType(ast, RootType, None)))
     } yield executionResult
 
     println(result.fold(identity, identity))
@@ -79,9 +79,9 @@ object Launcher {
     val result = for {
       rawJson <- Try(json.get).toEither
       json    <- io.circe.parser.parse(rawJson).left.map(_.message)
-      node = parseJson(json)
-      code = emitScala(node)
-    } yield executeCode(generateCode(rawJson, code.getOrElse(""), emitType(node, RootType, None)))
+      ast  = parseJson(json)
+      code = generateCode(emit(ast).getOrElse(""), emitType(ast, RootType, None))
+    } yield executeCode(code, ast, json)
 
     result.left.map(println)
     System.exit(if (result.isLeft) 1 else 0)
@@ -95,7 +95,7 @@ object Launcher {
 
   private def readIn: Either[Throwable, String] =
     Try(
-      Await.result(Future(LazyList.continually(scala.io.StdIn.readLine()).takeWhile(_.nonEmpty).mkString), 100.millis)
+      Await.result(Future(LazyList.continually(scala.io.StdIn.readLine()).takeWhile(_ != null).mkString), 100.millis)
     ).toEither
 
   private def emptyToNone(str: String): Option[String] = Option(str).collect { case x if x.trim.nonEmpty => x }

@@ -13,7 +13,7 @@ class IntegrationSpec extends AnyFunSpec {
     it("should return unchanged JSON when no modifications are made") {
       val exampleJson = io.circe.parser.parse(Source.fromResource("example.json").getLines.mkString).toOption.get
 
-      val result = executeCode(exampleJson, generateCode("root", emitScala(parseJson(exampleJson)).get, RootType))
+      val result = executeCode(exampleJson, generateCode("root", emit(parseJson(exampleJson)).get, RootType))
       val actual = io.circe.parser.parse(result).toOption.get
 
       assert(actual == exampleJson)

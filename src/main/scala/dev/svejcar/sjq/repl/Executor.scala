@@ -1,10 +1,14 @@
 package dev.svejcar.sjq.repl
 
+import dev.svejcar.sjq.core.Node
+import io.circe.Json
+
 object Executor {
 
-  def executeCode(code: String): Unit = ammonite.Main(predefCode = code).run()
+  def executeCode(code: String, ast: Node, json: Json): Unit =
+    ammonite.Main(predefCode = code).run("ast" -> ast, "json" -> json)
 
-  def generateCode(rawJson: String, definitions: String, rootType: String): String =
+  def generateCode(definitions: String, rootType: String): String =
     s"""|import io.circe.Json
         |import io.circe.generic.auto._
         |import io.circe._
@@ -14,10 +18,11 @@ object Executor {
         |println("Compiling type definitions from input JSON (this may take a while)...")
         |$definitions
         |println("\\n")
-        |println("[i] To access the data parsed from JSON use the 'root' variable.")
+        |println("[i] Variable 'root' holds Scala representation of parsed JSON")
+        |println("[i] Variable 'json' holds parsed JSON")
+        |println("[i] Variable 'ast' holds internal AST representation of data (for debugging purposes)")
         |println("[i] To serialize data back to JSON use '.asJson.spaces2'\\n\\n")
         |
-        |val json = io.circe.parser.parse(\"\"\" $rawJson \"\"\").toOption.get
         |val root = json.as[$rootType].getOrElse(null)
         |""".stripMargin
 
