@@ -13,9 +13,9 @@ lazy val root = (project in file("."))
       Dependencies.circeCore,
       Dependencies.circeGeneric,
       Dependencies.circeParser,
+      Dependencies.optparse,
       Dependencies.scalaCompiler,
       Dependencies.scalaTest,
-      Dependencies.scopt,
       Dependencies.simulacrum
     ),
     assembly / mainClass := Some("dev.svejcar.sjq.Launcher"),
