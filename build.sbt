@@ -25,7 +25,7 @@ lazy val root = (project in file("."))
       case x                             => MergeStrategy.first
     },
     Test / parallelExecution := false,
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, homepage),
     buildInfoPackage := "dev.svejcar.sjq"
   )
 

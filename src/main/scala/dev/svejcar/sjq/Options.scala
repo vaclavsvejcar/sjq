@@ -59,11 +59,15 @@ object Options {
 
   private val replOptions: Parser[Options] = (inlineSourceType <|> fileSourceType).map(Repl.apply)
 
-  private val commands = subparser(
+  private val commands: Parser[Options] = subparser(
     command("cli", info(cliOptions, progDesc("Non-interactive mode, similar to original jq"))),
     command("repl", info(replOptions, progDesc("Interactive mode using the Ammonite REPL")))
   )
 
-  val parser: ParserInfo[Options] = info(commands <*> helper)
+  private def headerText[A]: InfoMod[A] = header(
+    s"${BuildInfo.name}, v${BuildInfo.version} :: ${BuildInfo.homepage.get}"
+  )
+
+  val parser: ParserInfo[Options] = info(commands <*> helper, headerText)
 
 }
