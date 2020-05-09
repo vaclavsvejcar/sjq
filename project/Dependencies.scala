@@ -7,7 +7,7 @@ object Dependencies {
     val circe         = "0.13.0"
     val optparse      = "0.9.0"
     val scalaCompiler = "2.13.2"
-    val scalaTest     = "3.1.1"
+    val scalaTest     = "3.1.2"
     val simulacrum    = "1.0.0"
   }
 
