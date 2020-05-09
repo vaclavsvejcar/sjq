@@ -74,8 +74,9 @@ object Launcher {
       rawJson <- getRawJson
       json    <- io.circe.parser.parse(rawJson).left.map(_.message)
       repr = parseJson(json)
-      code = generateCode(emit(repr).getOrElse(""), emitType(repr, RootType, None))
-    } yield executeCode(code, repr, json)
+      defs = emit(repr).getOrElse("")
+      code = generateCode(defs, emitType(repr, RootType, None))
+    } yield executeCode(code, defs, repr, json)
 
     result.left.map(println)
     System.exit(if (result.isLeft) 1 else 0)
