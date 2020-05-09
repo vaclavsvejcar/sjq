@@ -2,7 +2,7 @@
 
 You may know the [jq JSON command line processor][web:jq]. You may also know the [ammonite REPL][web:ammonite-repl]. Now imagine that you combine these two awesome tools into single one and you have the __sjq__.
 
-__sjq__ is small tool written in [Scala][web:scala] that compiles your input _JSON_ into _Scala case classes_, so you can use __Scala expressions__ and collections API __to transform your data__, no need to remember any special syntax! And thanks to the embedded [ammonite REPL][web:ammonite-repl], you can use all that goodies such as __syntax highlighting__, __auto completion on TAB__ and much more! Manipulating _JSON_ data has never been easier :-)
+__sjq__ is a small tool written in [Scala][web:scala] that compiles your input _JSON_ into _Scala case classes_, so you can use __Scala expressions__ and collections API __to transform your data__, no need to remember any special syntax! And thanks to the embedded [ammonite REPL][web:ammonite-repl], you can use all that goodies such as __syntax highlighting__, __auto completion on TAB__ and much more! Manipulating _JSON_ data has never been easier :-)
 
 > 🚧 __Work in Progress__ 🚧 - This software is under active development and hasn't even reached its initial public release. Please bear in mind that documentation is likely missing and API and/or command line interface can change unexpectedly. At least for now, below is small demo how you can use __sjq__ right now.
 
@@ -25,7 +25,7 @@ __sjq__ is small tool written in [Scala][web:scala] that compiles your input _JS
         - [4.2.1. Example](#421-example)
         - [4.2.2. Command Line Options](#422-command-line-options)
 - [5. How it Works?](#5-how-it-works)
-- [6. Current Limitations](#6-current-limitations)
+- [6. Known Issues / Future Work](#6-known-issues--future-work)
 
 <!-- /TOC -->
 
@@ -79,7 +79,7 @@ res1: Seq[root0.users] = List(users("Lucy Snow", 21.0), users("John Smith", 42.0
 Interactive mode is executed using the `java -jar sjq.jar repl` and you need to specify the source of input JSON either as local file (`-f|--file=PATH`) or as inline value (`-j|--json=JSON`).
 
 #### 4.1.3. Exposed variables
-Following variables are exposed to the _ammonite REPL_ so you can access them as needed:
+Following variables are exposed to the _ammonite REPL_, so you can access them as needed:
 
 - `root` - _Scala_ representation of _JSON_ data, this is probably what you'll use the most
 - `json` - [Circe's][web:circe] representation of parsed _JSON_ data
@@ -106,8 +106,8 @@ For the curious ones, here's how __sjq__ works under the hood:
 1. Next step is to emit valid _Scala_ code (_case classes_ and _objects_) matching the input _JSON_ (see [dev.svejcar.sjq.core.Emitter][meta:file/Emitter]). This code is the compiled in runtime (this is the part that may take long time).
 1. Last step is to read the input JSON data into generated _Scala_ representation. This is done using the [Circe's automatic derivation][web:circe/auto-derivation] mechanism.
 
-## 6. Current Limitations
-__sjq__ is under heavy development and things might not be still perfect yet. Here is the list of known issues and/or limitations that should be targeted in future releases:
+## 6. Known Issues / Future Work
+__sjq__ is under heavy development and things might not be perfect yet. Here is the list of known issues and/or limitations that should be targeted in future releases:
 
 - __Performance:__ compile more complex __JSON__ can be __very slow__, as it needs to do both __compilation in runtime__ of generated _Scala_ code and __generic derivation__ for _Circe's decoders/encoders_. Performance improvements should be one of main targets in future releases
 - __Occasional crashes:__ more complex __JSON__ structures might cause runtime crashes, mostly due to incorrectly generated _Scala_ code and/or not matching derived _JSON_ encoders/decoders. If that happens for you, please [report that as new issue][meta:issues].
