@@ -75,8 +75,8 @@ trait TestData {
   val EmittedNode1: String =
     """|case class root0(first: String, second: root0.second, `third_t`: Seq[root0.`third_t`], fourth: Seq[Option[String]], fifth: Seq[String])
        |object root0 {
-       |  case class second(second1: String, second2: Double)
-       |  case class `third_t`(one: Option[String], two: Double, three: Option[String])
+       |  case class second(second1: String, second2: BigDecimal)
+       |  case class `third_t`(one: Option[String], two: BigDecimal, three: Option[String])
        |}""".stripMargin
 
 }

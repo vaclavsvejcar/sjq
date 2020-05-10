@@ -41,7 +41,7 @@ object Emitter {
   def emitType(node: Node, name: String, ns: Option[String]): String = node match {
     case NullN                      => "Option[String]"
     case BooleanN(required)         => req("Boolean", required)
-    case NumberN(required)          => req("Double", required)
+    case NumberN(required)          => req("BigDecimal", required)
     case StringN(required)          => req("String", required)
     case ArrayN(itemType, required) => req(s"Seq[${emitType(itemType, name, ns)}]", required)
     case ObjectN(_, required)       => req(s"${ns.fold("")(_ + ".")}$name", required)
