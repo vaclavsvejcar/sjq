@@ -7,8 +7,7 @@ __sjq__ is a small tool written in [Scala][web:scala] that compiles your input _
 > 🚧 __Work in Progress__ 🚧 - This software is under active development and hasn't even reached its initial public release. Please bear in mind that documentation is likely missing and API and/or command line interface can change unexpectedly. At least for now, below is small demo how you can use __sjq__ right now.
 
 ## 1. Example of Use
-[![asciicast](https://asciinema.org/a/iWnwjGEQH7jZ3FtnSSnp7TRs7.svg)](https://asciinema.org/a/iWnwjGEQH7jZ3FtnSSnp7TRs7)
-
+[![asciicast](https://asciinema.org/a/xRAifzwiJ961vYO6wpoq78Z3s.svg)](https://asciinema.org/a/xRAifzwiJ961vYO6wpoq78Z3s)
 ## 2. Table of Contents
 <!-- TOC -->
 
