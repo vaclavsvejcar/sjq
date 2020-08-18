@@ -3,11 +3,11 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val ammonite      = "2.1.4-8-5d0c097"
+    val ammonite      = "2.2.0"
     val circe         = "0.13.0"
     val optparse      = "0.9.0"
     val scalaCompiler = "2.13.3"
-    val scalaTest     = "3.2.0"
+    val scalaTest     = "3.2.1"
     val simulacrum    = "1.0.0"
   }
 
