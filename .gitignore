@@ -17,6 +17,7 @@ project/plugins/project/
 .ensime_cache/
 .scala_dependencies
 .worksheet
+.bsp
 
 ## node.js specific
 node_modules/
