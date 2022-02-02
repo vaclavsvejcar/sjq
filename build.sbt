@@ -3,7 +3,7 @@ ThisBuild / organization := "dev.svejcar"
 ThisBuild / licenses += ("BSD-3-Clause", url("https://opensource.org/licenses/BSD-3-Clause"))
 ThisBuild / homepage := Some(url("https://github.com/vaclavsvejcar/sjq"))
 
-ThisBuild / scalaVersion := "3.1.1"
+ThisBuild / scalaVersion := Dependencies.Version.scala
 
 lazy val root = (project in file("."))
   .settings(
