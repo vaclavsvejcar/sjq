@@ -45,7 +45,6 @@ object Parser:
 
 case class ParserLive() extends Parser:
   override def parseJson(json: Json): UIO[Node] =
-    import ZIO.foreach as zfe
     json.fold(
       jsonNull = ZIO.succeed(NNull),
       jsonBoolean = _ => ZIO.succeed(NBoolean()),
