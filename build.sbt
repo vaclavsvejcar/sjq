@@ -10,6 +10,7 @@ lazy val root = (project in file("."))
     name := "sjq",
     libraryDependencies ++= Seq(
       Dependencies.circeCore,
+      Dependencies.circeParser,
       Dependencies.zio,
       Dependencies.zioInteropCats,
       Dependencies.zioTest,

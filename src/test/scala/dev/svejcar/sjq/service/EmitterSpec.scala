@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dev.svejcar.sjq.service.live
+package dev.svejcar.sjq.service
 
 import cats.implicits.*
 import dev.svejcar.sjq.service.{Emitter, Sanitizer}
@@ -37,9 +37,9 @@ import zio.*
 import zio.test.*
 import zio.test.Assertion.*
 
-object EmitterLiveSpec extends DefaultRunnableSpec with TestData:
+object EmitterSpec extends DefaultRunnableSpec with TestData:
 
-  override def spec = suite("EmitterLiveSpec") {
+  override def spec = suite("EmitterSpec") {
     test("emit produces valid Scala code") {
       for
         emitter <- ZIO.service[Emitter]
