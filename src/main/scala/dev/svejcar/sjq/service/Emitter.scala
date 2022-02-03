@@ -41,7 +41,6 @@ trait Emitter:
 
 object Emitter:
   val live: URLayer[Sanitizer, dev.svejcar.sjq.service.Emitter] = (EmitterLive(_)).toLayer[Emitter]
-  def emit(node: Node): URIO[Emitter, Option[String]]           = ZIO.serviceWithZIO(_.emit(node))
 
 case class EmitterLive(sanitizer: Sanitizer) extends Emitter:
 
@@ -50,32 +49,31 @@ case class EmitterLive(sanitizer: Sanitizer) extends Emitter:
 
   override def emit(node: Node): UIO[Option[String]] = emit0(node)
 
-  def emit0(node: Node, ns: String = RootType, indent: Int = 0): UIO[Option[String]] =
+  def emit0(node: Node, rawNs: String = RootType, indent: Int = 0): UIO[Option[String]] =
     node match
       case NObject(fields, _) =>
-        import ZIO.foreach as zfe
         for
-          sNs      <- sanitizer.sanitize(ns)
-          fields0  <- zfe(fields.map { (name, value) => emitField(value, name, sNs) })(identity)
-          children <- zfe(fields.map { (name, value) => emit0(value, name, indent + 1) })(identity).map(_.flatten)
+          ns       <- sanitizer.sanitize(rawNs)
+          fields0  <- ZIO.foreach(fields.toList)((name, value) => emitField(value, name, ns))
+          children <- ZIO.foreach(fields.toList)((name, value) => emit0(value, name, indent + 1)).map(_.flatten)
         yield
           val ind       = Seq.fill(indent * IndentSpaces)(" ").mkString
-          val caseClass = s"${ind}case class $sNs(${fields0.mkString(", ")})"
-          val companion = if (children.isEmpty) "" else children.mkString(s"\n${ind}object $sNs {\n", "\n", s"\n$ind}")
+          val caseClass = s"${ind}case class $ns(${fields0.mkString(", ")})"
+          val companion = if (children.isEmpty) "" else children.mkString(s"\n${ind}object $ns {\n", "\n", s"\n$ind}")
 
           (caseClass + companion).some
       case NArray(itemType, _) =>
         for
-          sNs     <- sanitizer.sanitize(ns)
-          emitted <- emit0(itemType, ns, indent)
+          ns      <- sanitizer.sanitize(rawNs)
+          emitted <- emit0(itemType, rawNs, indent)
         yield emitted
       case _ => ZIO.succeed(none[String])
 
-  def emitField(node: Node, name: String, ns: String): UIO[String] =
+  def emitField(node: Node, rawName: String, ns: String): UIO[String] =
     for
-      sName <- sanitizer.sanitize(name)
-      tpe   <- emitType(node, sName, ns.some)
-    yield s"$sName: $tpe"
+      name <- sanitizer.sanitize(rawName)
+      tpe  <- emitType(node, name, ns.some)
+    yield s"$name: $tpe"
 
   def emitType(node: Node, name: String, ns: Option[String]): UIO[String] =
     def req(name: String, required: Boolean): String = if (required) name else s"Option[$name]"

@@ -36,8 +36,7 @@ trait Sanitizer:
   def sanitize(input: String): UIO[String]
 
 object Sanitizer:
-  val live: ULayer[SanitizerLive]                      = ZLayer.succeed(SanitizerLive())
-  def sanitize(input: String): URIO[Sanitizer, String] = ZIO.serviceWithZIO(_.sanitize(input))
+  val live: ULayer[SanitizerLive] = ZLayer.succeed(SanitizerLive())
 
 case class SanitizerLive() extends Sanitizer:
 
