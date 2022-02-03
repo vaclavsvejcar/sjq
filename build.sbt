@@ -9,12 +9,17 @@ lazy val root = (project in file("."))
   .settings(
     name := "sjq",
     libraryDependencies ++= Seq(
+      Dependencies.ammonite,
       Dependencies.circeCore,
       Dependencies.circeParser,
       Dependencies.zio,
       Dependencies.zioInteropCats,
       Dependencies.zioTest,
       Dependencies.zioTestSbt
+    ),
+    excludeDependencies ++= Seq(
+      ExclusionRule("com.lihaoyi", "sourcecode_2.13"),
+      ExclusionRule("com.lihaoyi", "fansi_2.13"),
     ),
     assembly / mainClass := Some("dev.svejcar.sjq.Launcher"),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")

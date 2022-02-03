@@ -35,7 +35,7 @@ import dev.svejcar.sjq.model.Node.{NArray, NNumber, NObject, NString}
 
 import scala.collection.immutable.SeqMap
 
-trait TestData:
+trait TestData {
 
   val RawJson1: String =
     s"""
@@ -80,3 +80,4 @@ trait TestData:
        |  case class second(second1: String, second2: BigDecimal)
        |  case class `third_t`(one: Option[String], two: BigDecimal, three: Option[String])
        |}""".stripMargin
+}

@@ -30,15 +30,17 @@
 
 package dev.svejcar.sjq.service
 
-import zio.*
+import zio._
 
-trait Sanitizer:
+trait Sanitizer {
   def sanitize(input: String): UIO[String]
+}
 
-object Sanitizer:
+object Sanitizer {
   val live: ULayer[SanitizerLive] = ZLayer.succeed(SanitizerLive())
+}
 
-case class SanitizerLive() extends Sanitizer:
+case class SanitizerLive() extends Sanitizer {
 
   val SpecialChars: Set[String] = Set("-", "_", ".", ":", "$")
   val ScalaKeywords: Set[String] = Set(
@@ -94,3 +96,4 @@ case class SanitizerLive() extends Sanitizer:
   def containsWhitespaces(input: String): Boolean = !input.matches("""\S+""")
   def isKeyword(input: String): Boolean           = ScalaKeywords.contains(input)
   def containsSpecialChar(input: String): Boolean = SpecialChars.exists(input.contains)
+}

@@ -30,20 +30,20 @@
 
 package dev.svejcar.sjq.service
 
-import cats.implicits.*
-import dev.svejcar.sjq.service.{Emitter, Sanitizer}
+import cats.implicits._
 import dev.svejcar.sjq.test.TestData
-import zio.*
-import zio.test.*
-import zio.test.Assertion.*
+import zio._
+import zio.test.Assertion._
+import zio.test._
 
-object EmitterSpec extends DefaultRunnableSpec with TestData:
+object EmitterSpec extends DefaultRunnableSpec with TestData {
 
   override def spec = suite("EmitterSpec") {
     test("emit produces valid Scala code") {
-      for
+      for {
         emitter <- ZIO.service[Emitter]
         actual  <- emitter.emit(ParsedNode1)
-      yield assert(actual)(equalTo(EmittedNode1.some))
+      } yield assert(actual)(equalTo(EmittedNode1.some))
     }
   }.provide(Emitter.live, Sanitizer.live)
+}

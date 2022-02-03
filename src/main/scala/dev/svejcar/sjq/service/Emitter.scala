@@ -30,19 +30,20 @@
 
 package dev.svejcar.sjq.service
 
-import cats.implicits.*
+import cats.implicits._
 import dev.svejcar.sjq.model.Node
-import dev.svejcar.sjq.model.Node.*
-import dev.svejcar.sjq.service.{Emitter, Sanitizer}
-import zio.*
+import dev.svejcar.sjq.model.Node._
+import zio._
 
-trait Emitter:
+trait Emitter {
   def emit(node: Node): UIO[Option[String]]
+}
 
-object Emitter:
+object Emitter {
   val live: URLayer[Sanitizer, dev.svejcar.sjq.service.Emitter] = (EmitterLive(_)).toLayer[Emitter]
+}
 
-case class EmitterLive(sanitizer: Sanitizer) extends Emitter:
+case class EmitterLive(sanitizer: Sanitizer) extends Emitter {
 
   val RootType: String  = "root0"
   val IndentSpaces: Int = 2
@@ -50,42 +51,44 @@ case class EmitterLive(sanitizer: Sanitizer) extends Emitter:
   override def emit(node: Node): UIO[Option[String]] = emit0(node)
 
   def emit0(node: Node, rawNs: String = RootType, indent: Int = 0): UIO[Option[String]] =
-    node match
+    node match {
       case NObject(fields, _) =>
-        for
+        for {
           ns       <- sanitizer.sanitize(rawNs)
-          fields0  <- ZIO.foreach(fields.toList)((name, value) => emitField(value, name, ns))
-          children <- ZIO.foreach(fields.toList)((name, value) => emit0(value, name, indent + 1)).map(_.flatten)
-        yield
+          fields0  <- ZIO.foreach(fields.toList) { case (name, value) => emitField(value, name, ns) }
+          children <- ZIO.foreach(fields.toList) { case (name, value) => emit0(value, name, indent + 1) }.map(_.flatten)
+        } yield {
           val ind       = Seq.fill(indent * IndentSpaces)(" ").mkString
           val caseClass = s"${ind}case class $ns(${fields0.mkString(", ")})"
           val companion = if (children.isEmpty) "" else children.mkString(s"\n${ind}object $ns {\n", "\n", s"\n$ind}")
 
           (caseClass + companion).some
-      case NArray(itemType, _) =>
-        for
-          ns      <- sanitizer.sanitize(rawNs)
-          emitted <- emit0(itemType, rawNs, indent)
-        yield emitted
-      case _ => ZIO.succeed(none[String])
+        }
+      case NArray(itemType, _) => emit0(itemType, rawNs, indent)
+      case _                   => ZIO.succeed(none[String])
+    }
 
   def emitField(node: Node, rawName: String, ns: String): UIO[String] =
-    for
+    for {
       name <- sanitizer.sanitize(rawName)
       tpe  <- emitType(node, name, ns.some)
-    yield s"$name: $tpe"
+    } yield s"$name: $tpe"
 
-  def emitType(node: Node, name: String, ns: Option[String]): UIO[String] =
+  def emitType(node: Node, name: String, ns: Option[String]): UIO[String] = {
     def req(name: String, required: Boolean): String = if (required) name else s"Option[$name]"
 
     def emitArray(itemType: Node, required: Boolean) =
-      for emitted <- emitType(itemType, name, ns)
-      yield req(s"Seq[$emitted]", required)
+      for {
+        emitted <- emitType(itemType, name, ns)
+      } yield req(s"Seq[$emitted]", required)
 
-    node match
+    node match {
       case NNull                      => ZIO.succeed("Option[String]")
       case NBoolean(required)         => ZIO.succeed(req("Boolean", required))
       case NNumber(required)          => ZIO.succeed(req("BigDecimal", required))
       case NString(required)          => ZIO.succeed(req("String", required))
       case NArray(itemType, required) => emitArray(itemType, required)
       case NObject(_, required)       => ZIO.succeed(req(s"${ns.fold("")(_ + ".")}$name", required))
+    }
+  }
+}

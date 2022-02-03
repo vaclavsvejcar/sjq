@@ -32,18 +32,18 @@ package dev.svejcar.sjq.app
 
 import dev.svejcar.sjq.model.Node
 import dev.svejcar.sjq.service.{Emitter, Sanitizer}
-import zio.*
+import zio._
 
 object TestApp extends ZIOAppDefault {
   override def run = myApp
 
   def app =
-    for
+    for {
       emitter <- ZIO.service[Emitter]
       console <- ZIO.service[Console]
       foo     <- emitter.emit(Node.NString())
       _       <- console.printLine(foo)
-    yield ()
+    } yield ()
 
   def myApp = app.provide(
     Console.live,

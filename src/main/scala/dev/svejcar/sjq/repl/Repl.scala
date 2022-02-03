@@ -28,22 +28,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dev.svejcar.sjq.service
+package dev.svejcar.sjq.repl
 
-import dev.svejcar.sjq.test.TestData
+import dev.svejcar.sjq.model.Node
+import io.circe.Json
 import zio._
-import zio.test.Assertion._
-import zio.test._
 
-object ParserSpec extends DefaultRunnableSpec with TestData {
+trait Repl {
+  def executeCode(code: String, defs: String, ast: Node, json: Json): Task[Unit]
+  def generateCode(definitions: String, rootType: String): UIO[String]
+}
 
-  override def spec = suite("ParserSpec") {
-    test("parses JSON into internal AST representation") {
-      val json = io.circe.parser.parse(RawJson1).toOption.get
-      for {
-        parser <- ZIO.service[Parser]
-        actual <- parser.parseJson(json)
-      } yield assert(actual)(equalTo(ParsedNode1))
+case class ReplLive() extends Repl {
+  override def executeCode(code: String, defs: String, ast: Node, json: Json): Task[Unit] =
+    Task {
+      ammonite.Main(predefCode = code).run("ast" -> ast, "defs" -> defs, "json" -> json)
     }
-  }.provide(Parser.live)
+
+  override def generateCode(definitions: String, rootType: String): UIO[String] =
+    ZIO.succeed {
+      s"""|import io.circe.Json
+          |import io.circe.generic.auto._
+          |import io.circe._
+          |import io.circe.syntax._
+          |
+          |println("\\n\\n--- Welcome to sjq REPL mode ---")
+          |println("Compiling type definitions from input JSON (this may take a while)...")
+          |$definitions
+          |println("\\n")
+          |println("[i] Variable 'root' holds Scala representation of parsed JSON")
+          |println("[i] Variable 'json' holds parsed JSON")
+          |println("[i] Variable 'ast' holds internal AST representation of data (for debugging purposes)")
+          |println("[i] Variable 'defs' holds generated Scala definitions (for debugging purposes)")
+          |println("[i] To serialize data back to JSON use '.asJson.spaces2'\\n\\n")
+          |
+          |val root = json.as[$rootType].getOrElse(null)
+          |""".stripMargin
+    }
 }

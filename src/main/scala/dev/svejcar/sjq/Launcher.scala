@@ -30,8 +30,10 @@
 
 package dev.svejcar.sjq
 
-object Launcher:
+object Launcher {
 
-  def main(args: Array[String]): Unit =
+  def main(args: Array[String]): Unit = {
     println("Hello")
-    println("Scala 3")
+    println("Scala 2")
+  }
+}
