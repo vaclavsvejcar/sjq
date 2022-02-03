@@ -13,6 +13,7 @@ object Dependencies {
   val ammonite       = "com.lihaoyi" % "ammonite"         % Version.ammonite cross CrossVersion.full
   val circeCore      = "io.circe"    %% "circe-core"       % Version.circe
   val circeParser    = "io.circe"    %% "circe-parser"     % Version.circe
+  val scalaCompiler = "org.scala-lang"     % "scala-compiler"        % Version.scala
   val zio            = "dev.zio"     %% "zio"              % Version.zio
   val zioInteropCats = "dev.zio"     %% "zio-interop-cats" % Version.zioInteropCats
   val zioTest        = "dev.zio"     %% "zio-test"         % Version.zio % "test"

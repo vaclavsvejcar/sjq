@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dev.svejcar.sjq.repl
+package dev.svejcar.sjq.service
 
 import dev.svejcar.sjq.model.Node
 import io.circe.Json
@@ -37,6 +37,10 @@ import zio._
 trait Repl {
   def executeCode(code: String, defs: String, ast: Node, json: Json): Task[Unit]
   def generateCode(definitions: String, rootType: String): UIO[String]
+}
+
+object Repl {
+  val live: ULayer[ReplLive] = ZLayer.succeed(ReplLive())
 }
 
 case class ReplLive() extends Repl {

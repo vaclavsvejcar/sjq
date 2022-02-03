@@ -12,6 +12,7 @@ lazy val root = (project in file("."))
       Dependencies.ammonite,
       Dependencies.circeCore,
       Dependencies.circeParser,
+      Dependencies.scalaCompiler,
       Dependencies.zio,
       Dependencies.zioInteropCats,
       Dependencies.zioTest,

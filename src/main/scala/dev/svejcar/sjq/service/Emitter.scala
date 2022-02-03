@@ -40,7 +40,7 @@ trait Emitter {
 }
 
 object Emitter {
-  val live: URLayer[Sanitizer, dev.svejcar.sjq.service.Emitter] = (EmitterLive(_)).toLayer[Emitter]
+  val live: URLayer[Sanitizer, Emitter] = (EmitterLive(_)).toLayer[Emitter]
 }
 
 case class EmitterLive(sanitizer: Sanitizer) extends Emitter {
