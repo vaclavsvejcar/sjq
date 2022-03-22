@@ -41,6 +41,12 @@ trait Repl {
 
 object Repl {
   val live: ULayer[ReplLive] = ZLayer.succeed(ReplLive())
+
+  def executeCode(code: String, defs: String, ast: Node, json: Json): ZIO[Repl, Throwable, Unit] =
+    ZIO.serviceWithZIO[Repl](_.executeCode(code, defs, ast, json))
+
+  def generateCode(definitions: String, rootType: String): ZIO[Repl, Nothing, String] =
+    ZIO.serviceWithZIO[Repl](_.generateCode(definitions, rootType))
 }
 
 case class ReplLive() extends Repl {

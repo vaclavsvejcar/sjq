@@ -37,10 +37,14 @@ import zio._
 
 trait Emitter {
   def emit(node: Node): UIO[Option[String]]
+  def emitRoot(node: Node): UIO[String]
 }
 
 object Emitter {
   val live: URLayer[Sanitizer, Emitter] = (EmitterLive(_)).toLayer[Emitter]
+
+  def emit(node: Node): ZIO[Emitter, Nothing, Option[String]] = ZIO.serviceWithZIO[Emitter](_.emit(node))
+  def emitRoot(node: Node): ZIO[Emitter, Nothing, String] = ZIO.serviceWithZIO[Emitter](_.emitRoot(node))
 }
 
 case class EmitterLive(sanitizer: Sanitizer) extends Emitter {
@@ -49,6 +53,8 @@ case class EmitterLive(sanitizer: Sanitizer) extends Emitter {
   val IndentSpaces: Int = 2
 
   override def emit(node: Node): UIO[Option[String]] = emit0(node)
+
+  override def emitRoot(node: Node): UIO[String] = emitType(node, RootType, None)
 
   def emit0(node: Node, rawNs: String = RootType, indent: Int = 0): UIO[Option[String]] =
     node match {

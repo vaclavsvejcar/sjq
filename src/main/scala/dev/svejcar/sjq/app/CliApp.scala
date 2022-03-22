@@ -28,50 +28,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package dev.svejcar.sjq
+package dev.svejcar.sjq.app
 
-import dev.svejcar.sjq.service.{Emitter, Parser, Repl, Sanitizer}
-import optparse_applicative.execParser
-import zio.{Chunk, ZIO, ZIOAppArgs, ZIOAppDefault}
+import dev.svejcar.sjq.Options
+import zio.ZIO
 
-import scala.io.Source
-import scala.util.Using
+object CliApp {
 
-object Launcher extends ZIOAppDefault {
+  def run = ???
 
-  override def run = {
-    def chooseApp(options: Options) = options match {
-      case opts: Options.Cli  => ???
-      case opts: Options.Repl => runRepl(opts)
-    }
-
-    for {
-      args    <- ZIOAppArgs.getArgs
-      options <- parseOptions(args)
-      _       <- chooseApp(options).provide(Emitter.live, Parser.live, Repl.live, Sanitizer.live)
-    } yield ()
-  }
-
-  private def runRepl(opts: Options.Repl) = {
-
-    val getRawJson = opts.input match {
-      case SourceType.Inline(input)   => ZIO.succeed(input)
-      case SourceType.LocalFile(path) => ZIO.fromTry(Using(Source.fromFile(path))(_.getLines().mkString))
-    }
-
-    for {
-      rawJson <- getRawJson
-      json    <- parseJson(rawJson)
-      repr    <- Parser.parseJson(json)
-      defs    <- Emitter.emit(repr).map(_.getOrElse(""))
-      root    <- Emitter.emitRoot(repr)
-      code    <- Repl.generateCode(defs, root)
-      _       <- Repl.executeCode(code, defs, repr, json)
-    } yield ()
-  }
-
-  private def parseJson(raw: String) = ZIO.fromEither(io.circe.parser.parse(raw))
-
-  private def parseOptions(args: Chunk[String]) =
-    ZIO.succeed(execParser(args.toArray, BuildInfo.name, Options.parser));
 }

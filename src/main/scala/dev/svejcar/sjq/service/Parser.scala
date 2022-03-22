@@ -43,6 +43,8 @@ trait Parser {
 
 object Parser {
   val live: ULayer[ParserLive] = ZLayer.succeed(ParserLive())
+
+  def parseJson(json: Json): ZIO[Parser, Nothing, Node] = ZIO.serviceWithZIO[Parser](_.parseJson(json))
 }
 
 case class ParserLive() extends Parser {

@@ -30,48 +30,44 @@
 
 package dev.svejcar.sjq
 
-import dev.svejcar.sjq.service.{Emitter, Parser, Repl, Sanitizer}
-import optparse_applicative.execParser
-import zio.{Chunk, ZIO, ZIOAppArgs, ZIOAppDefault}
+import optparse_applicative._
+import scalaz.syntax.applicativePlus._
 
-import scala.io.Source
-import scala.util.Using
+import java.io.File
 
-object Launcher extends ZIOAppDefault {
+sealed trait SourceType
+object SourceType {
+  case class Inline(raw: String)   extends SourceType
+  case class LocalFile(file: File) extends SourceType
+}
 
-  override def run = {
-    def chooseApp(options: Options) = options match {
-      case opts: Options.Cli  => ???
-      case opts: Options.Repl => runRepl(opts)
-    }
+sealed trait Options
+object Options {
+  case class Cli(access: String, json: Option[String]) extends Options
+  case class Repl(input: SourceType)                   extends Options
 
-    for {
-      args    <- ZIOAppArgs.getArgs
-      options <- parseOptions(args)
-      _       <- chooseApp(options).provide(Emitter.live, Parser.live, Repl.live, Sanitizer.live)
-    } yield ()
-  }
+  private val cliOptions: Parser[Options] = ^(
+    strOption(short('a'), long("access"), metavar("EXPRESSION"), help("Operation to perform on 'root' object")),
+    optional(strOption(short('j'), long("json"), metavar("JSON"), help("JSON to process")))
+  )(Cli.apply)
 
-  private def runRepl(opts: Options.Repl) = {
+  private val inlineSourceType: Parser[SourceType] =
+    strOption(short('j'), long("json"), metavar("JSON"), help("JSON to process")).map(SourceType.Inline)
+  private val fileSourceType: Parser[SourceType] =
+    strOption(short('f'), long("file"), metavar("FILE"), help("JSON file to process"))
+      .map(new File(_))
+      .map(SourceType.LocalFile)
 
-    val getRawJson = opts.input match {
-      case SourceType.Inline(input)   => ZIO.succeed(input)
-      case SourceType.LocalFile(path) => ZIO.fromTry(Using(Source.fromFile(path))(_.getLines().mkString))
-    }
+  private val replOptions: Parser[Options] = (inlineSourceType <|> fileSourceType).map(Repl.apply)
 
-    for {
-      rawJson <- getRawJson
-      json    <- parseJson(rawJson)
-      repr    <- Parser.parseJson(json)
-      defs    <- Emitter.emit(repr).map(_.getOrElse(""))
-      root    <- Emitter.emitRoot(repr)
-      code    <- Repl.generateCode(defs, root)
-      _       <- Repl.executeCode(code, defs, repr, json)
-    } yield ()
-  }
+  private val commands: Parser[Options] = subparser(
+    command("cli", info(cliOptions, progDesc("Non-interactive mode, similar to original jq"))),
+    command("repl", info(replOptions, progDesc("Interactive mode using the Ammonite REPL")))
+  )
 
-  private def parseJson(raw: String) = ZIO.fromEither(io.circe.parser.parse(raw))
+  private def headerText[A]: InfoMod[A] = header(
+    s"${BuildInfo.name}, v${BuildInfo.version} :: ${BuildInfo.homepage.get}"
+  )
 
-  private def parseOptions(args: Chunk[String]) =
-    ZIO.succeed(execParser(args.toArray, BuildInfo.name, Options.parser));
+  val parser: ParserInfo[Options] = info(commands <*> helper, headerText)
 }

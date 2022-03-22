@@ -6,22 +6,22 @@ ThisBuild / homepage := Some(url("https://github.com/vaclavsvejcar/sjq"))
 ThisBuild / scalaVersion := Dependencies.Version.scala
 
 lazy val root = (project in file("."))
+  .enablePlugins(BuildInfoPlugin)
   .settings(
     name := "sjq",
     libraryDependencies ++= Seq(
       Dependencies.ammonite,
       Dependencies.circeCore,
       Dependencies.circeParser,
+      Dependencies.optparse,
       Dependencies.scalaCompiler,
       Dependencies.zio,
       Dependencies.zioInteropCats,
       Dependencies.zioTest,
       Dependencies.zioTestSbt
     ),
-    excludeDependencies ++= Seq(
-      ExclusionRule("com.lihaoyi", "sourcecode_2.13"),
-      ExclusionRule("com.lihaoyi", "fansi_2.13"),
-    ),
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, homepage),
+    buildInfoPackage := "dev.svejcar.sjq",
     assembly / mainClass := Some("dev.svejcar.sjq.Launcher"),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
   )
