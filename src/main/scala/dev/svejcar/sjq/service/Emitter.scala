@@ -44,7 +44,7 @@ object Emitter {
   val live: URLayer[Sanitizer, Emitter] = (EmitterLive(_)).toLayer[Emitter]
 
   def emit(node: Node): ZIO[Emitter, Nothing, Option[String]] = ZIO.serviceWithZIO[Emitter](_.emit(node))
-  def emitRoot(node: Node): ZIO[Emitter, Nothing, String] = ZIO.serviceWithZIO[Emitter](_.emitRoot(node))
+  def emitRoot(node: Node): ZIO[Emitter, Nothing, String]     = ZIO.serviceWithZIO[Emitter](_.emitRoot(node))
 }
 
 case class EmitterLive(sanitizer: Sanitizer) extends Emitter {

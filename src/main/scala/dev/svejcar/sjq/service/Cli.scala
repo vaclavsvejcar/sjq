@@ -43,6 +43,12 @@ trait Cli {
 
 object Cli {
   val live: ULayer[CliLive] = ZLayer.succeed(CliLive())
+
+  def executeCode(json: Json, code: String): ZIO[Cli, Throwable, String] =
+    ZIO.serviceWithZIO[Cli](_.executeCode(json, code))
+
+  def generateCode(operation: String, definitions: String, rootType: String): ZIO[Cli, Nothing, String] =
+    ZIO.serviceWithZIO[Cli](_.generateCode(operation, definitions, rootType))
 }
 
 case class CliLive() extends Cli {

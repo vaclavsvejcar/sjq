@@ -13,6 +13,7 @@ object Dependencies {
 
   val ammonite       = "com.lihaoyi"         % "ammonite"             % Version.ammonite cross CrossVersion.full
   val circeCore      = "io.circe"           %% "circe-core"           % Version.circe
+  val circeGeneric   = "io.circe"           %% "circe-generic"        % Version.circe
   val circeParser    = "io.circe"           %% "circe-parser"         % Version.circe
   val optparse       = "com.github.xuwei-k" %% "optparse-applicative" % Version.optparse
   val scalaCompiler  = "org.scala-lang"      % "scala-compiler"       % Version.scala

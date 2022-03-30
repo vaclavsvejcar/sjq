@@ -30,10 +30,13 @@
 
 package dev.svejcar.sjq
 
-import dev.svejcar.sjq.service.{Emitter, Parser, Repl, Sanitizer}
+import dev.svejcar.sjq.service._
 import optparse_applicative.execParser
-import zio.{Chunk, ZIO, ZIOAppArgs, ZIOAppDefault}
+import zio.{Chunk, Console, ZIO, ZIOAppArgs, ZIOAppDefault}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 import scala.io.Source
 import scala.util.Using
 
@@ -41,14 +44,14 @@ object Launcher extends ZIOAppDefault {
 
   override def run = {
     def chooseApp(options: Options) = options match {
-      case opts: Options.Cli  => ???
+      case opts: Options.Cli  => runCli(opts)
       case opts: Options.Repl => runRepl(opts)
     }
 
     for {
       args    <- ZIOAppArgs.getArgs
       options <- parseOptions(args)
-      _       <- chooseApp(options).provide(Emitter.live, Parser.live, Repl.live, Sanitizer.live)
+      _ <- chooseApp(options).provide(Cli.live, Console.live, Emitter.live, Parser.live, Repl.live, Sanitizer.live)
     } yield ()
   }
 
@@ -68,6 +71,26 @@ object Launcher extends ZIOAppDefault {
       code    <- Repl.generateCode(defs, root)
       _       <- Repl.executeCode(code, defs, repr, json)
     } yield ()
+  }
+
+  private def runCli(opts: Options.Cli) = {
+    for {
+      rawJson <- readIn
+      json    <- parseJson(rawJson)
+      repr    <- Parser.parseJson(json)
+      defs    <- Emitter.emit(repr).map(_.getOrElse(""))
+      root    <- Emitter.emitRoot(repr)
+      code    <- Cli.generateCode(opts.access, defs, root)
+      result  <- Cli.executeCode(json, code)
+      _       <- Console.printLine(result)
+    } yield ()
+  }
+
+  // TODO use ZIO stuff here
+  private def readIn = {
+    ZIO.from {
+      Await.result(Future(LazyList.continually(scala.io.StdIn.readLine()).takeWhile(_ != null).mkString), 10.millis)
+    }
   }
 
   private def parseJson(raw: String) = ZIO.fromEither(io.circe.parser.parse(raw))

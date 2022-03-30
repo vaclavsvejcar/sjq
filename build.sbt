@@ -12,6 +12,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       Dependencies.ammonite,
       Dependencies.circeCore,
+      Dependencies.circeGeneric,
       Dependencies.circeParser,
       Dependencies.optparse,
       Dependencies.scalaCompiler,
@@ -23,5 +24,10 @@ lazy val root = (project in file("."))
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, homepage),
     buildInfoPackage := "dev.svejcar.sjq",
     assembly / mainClass := Some("dev.svejcar.sjq.Launcher"),
+    assembly / test := {},
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+      case x                             => MergeStrategy.first
+    },
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
   )
